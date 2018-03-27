@@ -19,6 +19,8 @@ Our Map
 int SOURCE = 3;
 int DESTINATION = 2;
 
+Node* findPath(Node*, Node*);
+
 int main() {
 	std::vector<Node*> nodeList;
 	for(int y = 1; y <= 3; y++){
@@ -38,18 +40,27 @@ int main() {
 	nodeList[6]->addConnection(nodeList[7]);
 	nodeList[7]->addConnection(nodeList[8]);
 
+	Node* destination = findPath(nodeList[SOURCE], nodeList[DESTINATION]);
+
+	while(destination){
+		std::cout << destination->_x << " " << destination->_y << std::endl;
+		destination = destination->getParent();
+	}
+}
+
+Node* findPath(Node* source, Node* target){
 	std::set<std::pair<double, Node*> > openList;
 	std::vector<Node*> closedList;
 
-	openList.insert(std::make_pair<double, Node*&>(0, nodeList[SOURCE]));
+	openList.insert(std::make_pair<double, Node*&>(0, source));
 
 	Node* currentNode;
 
 	while(!openList.empty()){
 		currentNode = openList.begin()->second;
 
-		if(currentNode == nodeList[DESTINATION]){
-			break;
+		if(currentNode == target){
+			return currentNode;
 		}
 
 		openList.erase(openList.begin());
@@ -62,12 +73,9 @@ int main() {
 			}
 
 			connection->setParent(currentNode);
-			openList.insert(std::make_pair<double, Node*&>(connection->computeCost(currentNode, nodeList[DESTINATION]), connection));
+			openList.insert(std::make_pair<double, Node*&>(connection->computeCost(currentNode, target), connection));
 		}
 	}
 
-	while(currentNode){
-		std::cout << currentNode->_x << " " << currentNode->_y << std::endl;
-		currentNode = currentNode->getParent();
-	}
+	return NULL;
 }
